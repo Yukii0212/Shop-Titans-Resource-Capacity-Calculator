@@ -1,10 +1,17 @@
 class ResourceCalculator {
     static calculate(tier, bins, guildLevel, cardLevel, talentLevel, dragonHoardLevel) {
+        let effectiveGuildLevel = guildLevel;
+        if (tier === 'T4') {
+            effectiveGuildLevel = Math.min(guildLevel, 4); // T4 max is 4
+        } else {
+            effectiveGuildLevel = Math.min(guildLevel, 8); // T1-T3 max is 8
+        }
+
         // Calculate total base capacity from regular bins (including guild perks)
         let totalBaseCapacity = 0;
         bins.forEach(bin => {
             const baseValue = Data.binBaseCapacities[tier][bin.level - 1];
-            const guildBonus = Data.guildPerks[tier] * guildLevel;
+            const guildBonus = Data.guildPerks[tier] * effectiveGuildLevel;
             const binTotal = baseValue + guildBonus;
             totalBaseCapacity += binTotal * bin.count;
         });
@@ -12,7 +19,7 @@ class ResourceCalculator {
         // Calculate Dragon Hoard capacity (including guild perks)
         const dhIndex = tier === 'T1' ? 0 : tier === 'T2' ? 1 : tier === 'T3' ? 2 : 3;
         const dragonHoardBase = Data.dragonHoardBase[dragonHoardLevel - 1]?.[dhIndex] || 0;
-        const dragonHoardGuildBonus = Data.guildPerks[tier] * guildLevel;
+        const dragonHoardGuildBonus = Data.guildPerks[tier] * effectiveGuildLevel;
         const dragonHoardCapacity = dragonHoardBase + dragonHoardGuildBonus;
 
         // Get bonus multipliers
@@ -31,7 +38,9 @@ class ResourceCalculator {
                 cardBonus: cardMultiplier,
                 talentBonus: talentMultiplier,
                 totalMultiplier: totalMultiplier,
-                beforeBonuses: totalBaseCapacity + dragonHoardCapacity
+                beforeBonuses: totalBaseCapacity + dragonHoardCapacity,
+                effectiveGuildLevel: effectiveGuildLevel,
+                guildBonusPerBin: Data.guildPerks[tier] * effectiveGuildLevel
             }
         };
     }

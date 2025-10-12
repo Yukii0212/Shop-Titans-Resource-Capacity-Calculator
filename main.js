@@ -1,9 +1,10 @@
 class App {
     constructor() {
         this.initializeEventListeners();
-        this.initializeDragonHoardOptions();
-        this.addBinRow('T1'); // Default tier
+        this.initializeDragonHoardOptions(); 
+        this.addBinRow('T1');
         this.updateTalentMaxLevel('T1');
+        this.updateGuildPerkDisplay();
     }
 
     initializeEventListeners() {
@@ -31,10 +32,16 @@ class App {
 
     initializeDragonHoardOptions() {
         const select = document.getElementById('dragon-level');
+        if (!select) {
+            console.error('Dragon level select element not found!');
+            return;
+        }
         select.innerHTML = '';
         for (let i = 1; i <= 25; i++) {
-            select.innerHTML += `<option value="${i}" ${i === 18 ? 'selected' : ''}>Level ${i}</option>`;
+             const selected = i === 18 ? 'selected' : '';
+            select.innerHTML += `<option value="${i}" ${selected}>Level ${i}</option>`;
         }
+         console.log('Dragon Hoard options initialized with', select.children.length, 'options');
     }
 
     onTierChange(tier) {
@@ -175,7 +182,7 @@ class App {
     }
 }
 
-// Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM loaded, initializing app...');
     new App();
 });

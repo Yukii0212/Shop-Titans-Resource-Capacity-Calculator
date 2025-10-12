@@ -1,66 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resource Calculator</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Bin Calculator</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <h1>Resource Capacity Calculator</h1>
+    <div class="container">
+        <h1>Resource Bin Calculator</h1>
+        
+        <form id="calculator-form">
+            <div class="form-group">
+                <label for="tier">Resource Tier:</label>
+                <select id="tier">
+                    <option value="T1">Tier 1 (Iron, Wood, Leather, Herb)</option>
+                    <option value="T2">Tier 2 (Steel, Ironwood, Fabric, Oil)</option>
+                    <option value="T3">Tier 3 (Jewels, Ether)</option>
+                    <option value="T4">Tier 4 (Essence)</option>
+                </select>
+            </div>
 
-    <div class="input-group">
-      <label for="tier">Tier:</label>
-      <select id="tier">
-        <option value="T1">T1</option>
-        <option value="T2">T2</option>
-        <option value="T3">T3</option>
-        <option value="T4">T4</option>
-      </select>
+            <div class="form-group">
+                <label>Bins:</label>
+                <div id="bin-container" class="bin-container">
+                    <!-- Bin rows will be added here -->
+                </div>
+                <button type="button" id="add-bin">Add Another Bin</button>
+            </div>
+
+            <div class="form-group">
+                <label for="guild-level">Guild Perk Level:</label>
+                <input type="number" id="guild-level" value="8" min="0" max="20">
+            </div>
+
+            <div class="form-group">
+                <label for="card-level">TCG Card Level:</label>
+                <select id="card-level">
+                    <option value="0">None</option>
+                    <option value="1">Level 1 (+5%)</option>
+                    <option value="2" selected>Level 2 (+10%)</option>
+                    <option value="3">Level 3 (+20%)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="talent-level">Crafting Talent Level:</label>
+                <select id="talent-level">
+                    <!-- Options will be populated based on tier -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="dragon-level">Dragon Hoard Level:</label>
+                <select id="dragon-level">
+                    <!-- Options 1-25 -->
+                </select>
+            </div>
+
+            <button type="submit">Calculate</button>
+        </form>
+
+        <div id="result" class="result"></div>
     </div>
 
-    <div class="input-group">
-      <label for="binLevel">Bin Level:</label>
-      <input type="number" id="binLevel" min="1" value="1">
-    </div>
-
-    <div class="input-group">
-      <label for="binAmount">Number of Bins:</label>
-      <input type="number" id="binAmount" min="1" value="1">
-    </div>
-
-    <div class="input-group">
-      <label for="guildLevel">Guild Perk Level:</label>
-      <input type="number" id="guildLevel" min="0" value="0">
-    </div>
-
-    <div class="input-group">
-      <label for="cardLevel">TCG Card Level:</label>
-      <input type="number" id="cardLevel" min="0" max="3" value="0">
-    </div>
-
-    <div class="input-group">
-      <label for="talentLevel">Crafting Talent Level:</label>
-      <input type="number" id="talentLevel" min="0" value="0">
-    </div>
-
-    <div class="input-group">
-      <label for="includeDH">Include Dragon Hoard:</label>
-      <input type="checkbox" id="includeDH">
-    </div>
-
-    <div class="input-group" id="dhLevelGroup" style="display:none;">
-      <label for="dhLevel">Dragon Hoard Level:</label>
-      <input type="number" id="dhLevel" min="1" value="1">
-    </div>
-
-    <button id="calculateBtn">Calculate</button>
-
-    <h2>Total: <span id="totalOutput">0</span></h2>
-  </div>
-
-  <script src="calculator.js"></script>
-  <script src="main.js"></script>
+    <script src="data.js"></script>
+    <script src="calculator.js"></script>
+    <script src="main.js"></script>
 </body>
 </html>

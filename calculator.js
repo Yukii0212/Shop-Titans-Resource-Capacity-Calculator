@@ -1,5 +1,6 @@
 class ResourceCalculator {
     static calculate(tier, bins, guildLevel, cardLevel, talentLevel, dragonHoardLevel) {
+        // Apply guild perk limits
         let effectiveGuildLevel = guildLevel;
         if (tier === 'T4') {
             effectiveGuildLevel = Math.min(guildLevel, 4); // T4 max is 4
@@ -17,14 +18,17 @@ class ResourceCalculator {
         });
 
         // Calculate Dragon Hoard capacity (including guild perks)
-        const dhIndex = tier === 'T1' ? 0 : tier === 'T2' ? 1 : tier === 'T3' ? 2 : 3;
-        const dragonHoardBase = Data.dragonHoardBase[dragonHoardLevel - 1]?.[dhIndex] || 0;
-        const dragonHoardGuildBonus = Data.guildPerks[tier] * effectiveGuildLevel;
-        const dragonHoardCapacity = dragonHoardBase + dragonHoardGuildBonus;
+        let dragonHoardCapacity = 0;
+        if (dragonHoardLevel > 0) {
+            const dhIndex = tier === 'T1' ? 0 : tier === 'T2' ? 1 : tier === 'T3' ? 2 : 3;
+            const dragonHoardBase = Data.dragonHoardBase[dragonHoardLevel - 1]?.[dhIndex] || 0;
+            const dragonHoardGuildBonus = Data.guildPerks[tier] * effectiveGuildLevel;
+            dragonHoardCapacity = dragonHoardBase + dragonHoardGuildBonus;
+        }
 
         // Get bonus multipliers
         const cardMultiplier = Data.cards[cardLevel] || 0;
-        const talentMultiplier = Data.talents[tier][talentLevel - 1] || 0;
+        const talentMultiplier = talentLevel === 0 ? 0 : Data.talents[tier][talentLevel - 1] || 0;
         const totalMultiplier = 1 + cardMultiplier + talentMultiplier;
 
         // Apply formula: (All visible values) × (1 + Card% + Talent%)
@@ -54,7 +58,13 @@ class ResourceCalculator {
     }
 
     static getGuildPerkValue(tier, level) {
-        return Data.guildPerks[tier] * level;
+        let effectiveLevel = level;
+        if (tier === 'T4') {
+            effectiveLevel = Math.min(level, 4);
+        } else {
+            effectiveLevel = Math.min(level, 8);
+        }
+        return Data.guildPerks[tier] * effectiveLevel;
     }
 
     static getDragonHoardBase(tier, level) {

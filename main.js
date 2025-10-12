@@ -1,7 +1,7 @@
 class App {
     constructor() {
         this.initializeEventListeners();
-        this.initializeDragonHoardOptions(); 
+        this.initializeDragonHoardOptions();
         this.addBinRow('T1');
         this.updateTalentMaxLevel('T1');
         this.updateGuildPerkDisplay();
@@ -32,16 +32,11 @@ class App {
 
     initializeDragonHoardOptions() {
         const select = document.getElementById('dragon-level');
-        if (!select) {
-            console.error('Dragon level select element not found!');
-            return;
-        }
-        select.innerHTML = '';
+        select.innerHTML = '<option value="0">No Dragon Hoard</option>';
         for (let i = 1; i <= 25; i++) {
-             const selected = i === 18 ? 'selected' : '';
+            const selected = i === 18 ? 'selected' : '';
             select.innerHTML += `<option value="${i}" ${selected}>Level ${i}</option>`;
         }
-         console.log('Dragon Hoard options initialized with', select.children.length, 'options');
     }
 
     onTierChange(tier) {
@@ -114,7 +109,7 @@ class App {
         const talentSelect = document.getElementById('talent-level');
         const maxLevel = ResourceCalculator.getTalentMaxLevel(tier);
         
-        talentSelect.innerHTML = '';
+        talentSelect.innerHTML = '<option value="0">Level 0 (+0%)</option>';
         for (let i = 1; i <= maxLevel; i++) {
             const bonus = Data.talents[tier][i - 1] * 100;
             talentSelect.innerHTML += `<option value="${i}" ${i === maxLevel ? 'selected' : ''}>Level ${i} (+${bonus}%)</option>`;
@@ -191,7 +186,7 @@ class App {
     }
 }
 
+// Initialize app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DOM loaded, initializing app...');
     new App();
 });

@@ -29,20 +29,23 @@ class ResourceCalculator {
         // Get bonus multipliers
         const cardMultiplier = Data.cards[cardLevel] || 0;
         const talentMultiplier = talentLevel === 0 ? 0 : Data.talents[tier][talentLevel - 1] || 0;
-        const totalMultiplier = 1 + cardMultiplier + talentMultiplier;
 
-        // Apply formula: (All visible values) × (1 + Card% + Talent%)
-        const totalCapacity = Math.floor((totalBaseCapacity + dragonHoardCapacity) * totalMultiplier);
+        // Apply formula sequentially: (All Base + Guild + DH) × (1 + Talent%) × (1 + Card%)
+        const beforeBonuses = totalBaseCapacity + dragonHoardCapacity;
+        const afterTalent = beforeBonuses * (1 + talentMultiplier);
+        const afterCard = afterTalent * (1 + cardMultiplier);
+        const totalCapacity = Math.floor(afterCard);
 
         return {
             total: totalCapacity,
             breakdown: {
                 baseBins: totalBaseCapacity,
                 dragonHoard: dragonHoardCapacity,
+                beforeBonuses: beforeBonuses,
+                afterTalent: afterTalent,
+                afterCard: afterCard,
                 cardBonus: cardMultiplier,
                 talentBonus: talentMultiplier,
-                totalMultiplier: totalMultiplier,
-                beforeBonuses: totalBaseCapacity + dragonHoardCapacity,
                 effectiveGuildLevel: effectiveGuildLevel,
                 guildBonusPerBin: Data.guildPerks[tier] * effectiveGuildLevel
             }

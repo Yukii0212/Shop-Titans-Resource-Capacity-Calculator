@@ -80,10 +80,34 @@ select:focus, input[type="number"]:focus {
 }
 
 .bin-row {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e1e8ed;
+}
+
+.bin-controls {
     display: flex;
-    gap: 10px;
-    margin-bottom: 10px;
-    align-items: center;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.bin-level-group, .bin-count-group {
+    flex: 1;
+}
+
+.bin-level-group label, .bin-count-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.9em;
+}
+
+.bin-level-group select, .bin-count-group input {
+    width: 100%;
+    margin-bottom: 0;
 }
 
 .bin-row select, .bin-row input {
@@ -99,6 +123,8 @@ select:focus, input[type="number"]:focus {
     cursor: pointer;
     font-size: 14px;
     transition: background 0.3s ease;
+    height: fit-content;
+    margin-bottom: 0;
 }
 
 .remove-bin:hover {
@@ -204,5 +230,20 @@ select:focus, input[type="number"]:focus {
     
     h1 {
         font-size: 1.8em;
+    }
+
+    .bin-controls {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+    
+    .bin-level-group, .bin-count-group {
+        width: 100%;
+    }
+    
+    .remove-bin {
+        align-self: flex-end;
+        width: auto;
     }
 }

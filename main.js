@@ -48,8 +48,48 @@ class App {
         // Update talent max level
         this.updateTalentMaxLevel(tier);
         
+        // Update guild perk options based on tier
+        this.updateGuildPerkOptions(tier);
+        
         // Update guild perk display
         this.updateGuildPerkDisplay();
+    }
+
+    updateGuildPerkOptions(tier) {
+        const guildSelect = document.getElementById('guild-level');
+        const currentValue = parseInt(guildSelect.value);
+        
+        if (tier === 'T4') {
+            // T4 can only go up to level 4
+            guildSelect.innerHTML = `
+                <option value="0">0 (+0)</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4" ${currentValue === 4 ? 'selected' : ''}>4 (Max for T4)</option>
+            `;
+            // If current value was above 4, set it to 4
+            if (currentValue > 4) {
+                guildSelect.value = '4';
+            }
+        } else {
+            // T1-T3 can go up to level 8
+            guildSelect.innerHTML = `
+                <option value="0">0 (+0)</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8" ${currentValue === 8 ? 'selected' : currentValue > 8 ? 'selected' : ''}>8 (Max for T1-T3)</option>
+            `;
+            // If current value was above 8, set it to 8
+            if (currentValue > 8) {
+                guildSelect.value = '8';
+            }
+        }
     }
 
     addBinRow(tier) {
@@ -59,15 +99,22 @@ class App {
         
         const maxLevel = ResourceCalculator.getMaxLevel(tier);
         const guildPerk = ResourceCalculator.getGuildPerkValue(tier, document.getElementById('guild-level').value);
-        const baseValue = Data.binBaseCapacities[tier][0]; // Level 1 base
+        const baseValue = Data.binBaseCapacities[tier][0];
         
         row.innerHTML = `
-            <select class="bin-level">
-                ${this.getLevelOptions(tier)}
-            </select>
-            <input type="number" class="bin-count" value="1" min="1" max="99">
-            <span class="bin-preview">→ ${baseValue + guildPerk} capacity</span>
-            <button type="button" class="remove-bin">Remove</button>
+            <div class="bin-controls">
+                <div class="bin-level-group">
+                    <label>Bin Level:</label>
+                    <select class="bin-level">
+                        ${this.getLevelOptions(tier)}
+                    </select>
+                </div>
+                <div class="bin-count-group">
+                    <label>Quantity:</label>
+                    <input type="number" class="bin-count" value="1" min="1" max="99">
+                </div>
+                <button type="button" class="remove-bin">Remove</button>
+            </div>
         `;
         container.appendChild(row);
 
@@ -90,7 +137,9 @@ class App {
         let options = '';
         for (let i = 1; i <= maxLevel; i++) {
             const baseValue = Data.binBaseCapacities[tier][i - 1];
-            options += `<option value="${i}">Level ${i} (Base: ${baseValue})</option>`;
+            const guildPerk = ResourceCalculator.getGuildPerkValue(tier, document.getElementById('guild-level').value);
+            const totalCapacity = baseValue + guildPerk;
+            options += `<option value="${i}">Level ${i} (Capacity: ${totalCapacity})</option>`;
         }
         return options;
     }
@@ -102,7 +151,10 @@ class App {
         const guildPerk = ResourceCalculator.getGuildPerkValue(tier, guildLevel);
         const total = baseValue + guildPerk;
         
-        row.querySelector('.bin-preview').textContent = `→ ${total} capacity`;
+        // Update the option text to show current capacity
+        const select = row.querySelector('.bin-level');
+        const currentOption = select.options[select.selectedIndex];
+        currentOption.text = `Level ${level} (Capacity: ${total})`;
     }
 
     updateTalentMaxLevel(tier) {
@@ -121,7 +173,7 @@ class App {
         const guildLevel = parseInt(document.getElementById('guild-level').value);
         const guildPerk = ResourceCalculator.getGuildPerkValue(tier, guildLevel);
         
-        // Update all bin previews
+        // Update all bin level dropdowns to show current capacities
         document.querySelectorAll('.bin-row').forEach(row => {
             this.updateBinPreview(row, tier);
         });
@@ -157,7 +209,6 @@ class App {
         const resultDiv = document.getElementById('result');
         const cardPercent = (result.breakdown.cardBonus * 100).toFixed(0);
         const talentPercent = (result.breakdown.talentBonus * 100).toFixed(0);
-        const totalPercent = (result.breakdown.totalMultiplier * 100 - 100).toFixed(0);
 
         let guildInfo = '';
         if (tier === 'T4' && result.breakdown.effectiveGuildLevel < parseInt(document.getElementById('guild-level').value)) {
@@ -172,15 +223,14 @@ class App {
                 <p><strong>Regular Bins:</strong> ${result.breakdown.baseBins.toFixed(1)}</p>
                 <p><strong>Dragon Hoard:</strong> +${result.breakdown.dragonHoard.toFixed(1)}</p>
                 <p><strong>Before Bonuses:</strong> ${result.breakdown.beforeBonuses.toFixed(1)}</p>
+                <p><strong>After Talent +${talentPercent}%:</strong> ${result.breakdown.afterTalent.toFixed(1)}</p>
+                <p><strong>After Card +${cardPercent}%:</strong> ${result.breakdown.afterCard.toFixed(1)}</p>
                 <p><strong>Guild Bonus per Bin:</strong> +${result.breakdown.guildBonusPerBin}</p>
-                <p><strong>Card Bonus:</strong> +${cardPercent}%</p>
-                <p><strong>Talent Bonus:</strong> +${talentPercent}%</p>
-                <p><strong>Total Multiplier:</strong> ×${result.breakdown.totalMultiplier.toFixed(2)} (+${totalPercent}%)</p>
                 ${guildInfo}
             </div>
             <div class="formula-note">
-                <strong>Formula:</strong> (Regular Bins + Dragon Hoard) × (1 + Card% + Talent%)<br>
-                <em>Note: Guild perks are already included in the bin values shown above</em>
+                <strong>Formula:</strong> [ (Base Bins + Guild Perks) + (Dragon Hoard Base + Guild Perks) ] × (1 + Talent%) × (1 + Card%)<br>
+                <em>Guild perks are applied to both regular bins and Dragon Hoard separately, then talent bonus applied first, then card bonus</em>
             </div>
         `;
     }

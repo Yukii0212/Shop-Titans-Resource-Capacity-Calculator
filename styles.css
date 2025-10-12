@@ -81,11 +81,11 @@ h2 {
     border-radius: 15px;
     border-left: 4px solid #ff69b4;
     box-shadow: 0 4px 15px rgba(255, 182, 193, 0.2);
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
 .form-section:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
 
 .form-group {
@@ -129,7 +129,7 @@ select:focus, input[type="number"]:focus {
     border-radius: 12px;
     border: 2px solid #ffe4ec;
     box-shadow: 0 2px 8px rgba(255, 182, 193, 0.2);
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
 }
 
 .bin-row:hover {
@@ -168,7 +168,7 @@ select:focus, input[type="number"]:focus {
     border-radius: 10px;
     cursor: pointer;
     font-size: 14px;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     height: fit-content;
     margin-bottom: 0;
     font-weight: 600;
@@ -188,7 +188,7 @@ select:focus, input[type="number"]:focus {
     cursor: pointer;
     font-size: 16px;
     font-weight: 700;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     text-align: center;
     font-family: 'Comic Neue', sans-serif;
     text-transform: uppercase;
@@ -206,7 +206,7 @@ select:focus, input[type="number"]:focus {
 
 .btn-primary:hover {
     background: linear-gradient(135deg, #ff1493 0%, #db0a7c 100%);
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(255, 105, 180, 0.6);
 }
 
@@ -218,7 +218,7 @@ select:focus, input[type="number"]:focus {
 
 .btn-secondary:hover {
     background: linear-gradient(135deg, #ff91a4 0%, #ff7a95 100%);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(255, 182, 193, 0.6);
 }
 
@@ -332,19 +332,4 @@ select:focus, input[type="number"]:focus {
     .form-section {
         padding: 15px;
     }
-}
-
-/* Add some cute decorative elements */
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-5px); }
-}
-
-.btn-primary, .btn-secondary {
-    animation: float 3s ease-in-out infinite;
-}
-
-.bin-row {
-    animation: float 2s ease-in-out infinite;
-    animation-delay: calc(var(--row-index, 0) * 0.1s);
 }

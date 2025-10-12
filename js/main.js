@@ -1,244 +1,134 @@
-/* main.js
-   Wire the UI to calculator.js
-*/
+import { calculateBin, calculateDH } from "./calculator.js";
 
-(function(){
-  const tierSelect = document.getElementById('tierSelect');
-  const cardLevel = document.getElementById('cardLevel');
-  const guildLevel = document.getElementById('guildLevel');
-  const guildLevelOut = document.getElementById('guildLevelOut');
-  const talentLevel = document.getElementById('talentLevel');
-  const roundMode = document.getElementById('roundMode');
-  const guildApplyDH = document.getElementById('guildApplyDH');
+const tierSelect = document.getElementById("tierSelect");
+const cardLevel = document.getElementById("cardLevel");
+const guildLevel = document.getElementById("guildLevel");
+const guildValue = document.getElementById("guildValue");
+const talentLevel = document.getElementById("talentLevel");
+const talentValue = document.getElementById("talentValue");
+const roundingMode = document.getElementById("roundingMode");
+const applyGuildToDH = document.getElementById("applyGuildToDH");
+const binsContainer = document.getElementById("binsContainer");
+const addBinBtn = document.getElementById("addBinBtn");
+const clearBinsBtn = document.getElementById("clearBinsBtn");
+const includeDH = document.getElementById("includeDH");
+const dhSection = document.getElementById("dhSection");
+const dhLevel = document.getElementById("dhLevel");
+const dhValue = document.getElementById("dhValue");
+const totalResource = document.getElementById("totalResource");
+const toggleBreakdown = document.getElementById("toggleBreakdown");
+const breakdownDiv = document.getElementById("breakdown");
 
-  const binsList = document.getElementById('binsList');
-  const addBinBtn = document.getElementById('addBinBtn');
-  const clearBinsBtn = document.getElementById('clearBinsBtn');
+let bins = [];
 
-  const includeDH = document.getElementById('includeDH');
-  const dhOptions = document.getElementById('dhOptions');
-  const dhLevel = document.getElementById('dhLevel');
-  const dhLevelOut = document.getElementById('dhLevelOut');
-
-  const totalValue = document.getElementById('totalValue');
-  const breakdown = document.getElementById('breakdown');
-  const toggleBreakdown = document.getElementById('toggleBreakdown');
-
-  // initial values
-  let binsState = []; // array of {id, level, count}
-  let uid = 1;
-
-  function createBinRow(bin){
-    // DOM structure:
-    // .bin-row -> level slider + levelOut, count input, remove button
-    const div = document.createElement('div');
-    div.className = 'bin-row';
-    div.dataset.id = bin.id;
-
-    const col1 = document.createElement('div'); col1.className='col';
-    const label = document.createElement('label'); label.textContent = 'Level';
-    const lvl = document.createElement('input'); lvl.type='range'; lvl.min=1; lvl.max=25; lvl.value=bin.level;
-    const lvlOut = document.createElement('output'); lvlOut.textContent = bin.level;
-    col1.appendChild(label); col1.appendChild(lvl); col1.appendChild(lvlOut);
-
-    const col2 = document.createElement('div'); col2.className='col';
-    const lbl2 = document.createElement('label'); lbl2.textContent = 'Count';
-    const count = document.createElement('input'); count.type='number'; count.min=1; count.value=bin.count; count.className='count';
-    col2.appendChild(lbl2); col2.appendChild(count);
-
-    const col3 = document.createElement('div'); col3.className='col';
-    const remove = document.createElement('button'); remove.className='remove secondary'; remove.textContent='Remove';
-    col3.appendChild(remove);
-
-    div.appendChild(col1);
-    div.appendChild(col2);
-    div.appendChild(col3);
-
-    // events
-    lvl.addEventListener('input', () => {
-      lvlOut.textContent = lvl.value;
-      syncBin(bin.id, { level: Number(lvl.value) });
-    });
-    count.addEventListener('change', () => {
-      let v = parseInt(count.value,10);
-      if(isNaN(v) || v < 1) v = 1;
-      count.value = v;
-      syncBin(bin.id, { count: v });
-    });
-    remove.addEventListener('click', () => {
-      removeBin(bin.id);
-    });
-
-    return div;
+function updateTalentMax() {
+  const tier = tierSelect.value;
+  const max = tier === "T1" || tier === "T4" ? 3 : 5;
+  talentLevel.max = max;
+  if (parseInt(talentLevel.value) > max) {
+    talentLevel.value = max;
+    talentValue.textContent = max;
   }
+}
 
-  function renderBins(){
-    binsList.innerHTML = '';
-    binsState.forEach(b => {
-      binsList.appendChild(createBinRow(b));
-    });
-    if(binsState.length === 0){
-      // add a friendly placeholder
-      const p = document.createElement('p');
-      p.className = 'small';
-      p.textContent = 'No bins yet — click "Add bin" to add a bin entry.';
-      binsList.appendChild(p);
-    }
-    updateAndRender();
-  }
+function addBin(level = 1, count = 1) {
+  const bin = document.createElement("div");
+  bin.className = "bin";
 
-  function syncBin(id, patch){
-    const idx = binsState.findIndex(x => x.id === id);
-    if(idx === -1) return;
-    binsState[idx] = Object.assign({}, binsState[idx], patch);
-    updateAndRender();
-  }
+  const levelLabel = document.createElement("label");
+  const slider = document.createElement("input");
+  slider.type = "range";
+  slider.min = 1;
+  slider.max = 25;
+  slider.value = level;
+  const levelSpan = document.createElement("span");
+  levelSpan.textContent = level;
 
-  function addBin(level = 1, count = 1){
-    const b = { id: uid++, level: level, count: count };
-    binsState.push(b);
-    renderBins();
-  }
-
-  function removeBin(id){
-    binsState = binsState.filter(b => b.id !== id);
-    renderBins();
-  }
-
-  function clearBins(){
-    binsState = [];
-    renderBins();
-  }
-
-  // update the talent options depending on tier
-  function refreshTalentOptions(){
-    const tier = tierSelect.value;
-    const map = window.ResourceCalc.TalentMap || {};
-    const arr = map[tier] || [];
-    talentLevel.innerHTML = '';
-    // allow 0 as option (no talent)
-    const opt0 = document.createElement('option'); opt0.value = '0'; opt0.textContent = '0 — none';
-    talentLevel.appendChild(opt0);
-    for(let i=0;i<arr.length;i++){
-      const level = i+1;
-      const pct = Math.round(arr[i]*100);
-      const opt = document.createElement('option');
-      opt.value = String(level);
-      opt.textContent = `${level} — ${pct}%`;
-      talentLevel.appendChild(opt);
-    }
-    // ensure selected value doesn't exceed new max
-    if(Number(talentLevel.value) > arr.length) talentLevel.value = '0';
-  }
-
-  // read inputs and compute
-  function gatherConfig(){
-    return {
-      tier: tierSelect.value,
-      bins: binsState.map(b => ({ level: Number(b.level), count: Number(b.count) })),
-      guildLevel: Number(guildLevel.value),
-      cardLevel: Number(cardLevel.value),
-      talentLevel: Number(talentLevel.value),
-      includeDH: includeDH.checked,
-      dhLevel: Number(dhLevel.value),
-      roundingMode: roundMode.value,
-      applyGuildToDH: guildApplyDH.checked
-    };
-  }
-
-  function updateAndRender(){
-    const cfg = gatherConfig();
-    const res = window.ResourceCalc.totalCapacity(cfg);
-    totalValue.textContent = res.total;
-
-    // breakdown rendering
-    breakdown.innerHTML = '';
-    const rows = res.breakdown.rows || [];
-    if(rows.length === 0 && !res.breakdown.dh){
-      const p = document.createElement('p'); p.className='small'; p.textContent='No bins to show in breakdown.';
-      breakdown.appendChild(p);
-      return;
-    }
-
-    rows.forEach(r => {
-      const item = document.createElement('div'); item.className='item';
-      const left = document.createElement('div');
-      left.innerHTML = `<strong>${r.label}</strong> <div class="small">base ${r.base} + guild ${r.guildFlat} → unit ${r.perUnit}</div>`;
-      const right = document.createElement('div');
-      right.innerHTML = `<div>${r.subtotal}</div><div class="small">${r.perUnit} × ${r.count}</div>`;
-      item.appendChild(left);
-      item.appendChild(right);
-      breakdown.appendChild(item);
-    });
-
-    if(res.breakdown.dh){
-      const r = res.breakdown.dh;
-      const item = document.createElement('div'); item.className='item';
-      const left = document.createElement('div');
-      left.innerHTML = `<strong>${r.label}</strong> <div class="small">base ${r.base} + guild ${r.guildFlat} → unit ${r.perUnit}</div>`;
-      const right = document.createElement('div');
-      right.innerHTML = `<div>${r.subtotal}</div><div class="small">${r.perUnit} × ${r.count}</div>`;
-      item.appendChild(left);
-      item.appendChild(right);
-      breakdown.appendChild(item);
-    }
-  }
-
-  // wire events
-  tierSelect.addEventListener('change', () => {
-    refreshTalentOptions();
-    updateAndRender();
+  slider.addEventListener("input", () => {
+    levelSpan.textContent = slider.value;
+    calculate();
   });
 
-  cardLevel.addEventListener('change', updateAndRender);
-  guildLevel.addEventListener('input', () => {
-    guildLevelOut.value = guildLevel.value;
-    updateAndRender();
+  const countInput = document.createElement("input");
+  countInput.type = "number";
+  countInput.min = 1;
+  countInput.value = count;
+  countInput.addEventListener("input", calculate);
+
+  levelLabel.textContent = "Level: ";
+  bin.append(levelLabel, slider, levelSpan, document.createTextNode("  Count:"), countInput);
+
+  binsContainer.appendChild(bin);
+  bins.push({ slider, countInput });
+  calculate();
+}
+
+function clearBins() {
+  bins = [];
+  binsContainer.innerHTML = "";
+  calculate();
+}
+
+function calculate() {
+  const tier = tierSelect.value;
+  const guild = parseInt(guildLevel.value);
+  const card = parseInt(cardLevel.value);
+  const talent = parseInt(talentLevel.value);
+  const rounding = roundingMode.value;
+  const applyGuild = applyGuildToDH.checked;
+
+  let total = 0;
+  let breakdown = [];
+
+  bins.forEach((binObj, i) => {
+    const lvl = parseInt(binObj.slider.value);
+    const cnt = parseInt(binObj.countInput.value);
+    const perBin = calculateBin(tier, lvl, guild, card, talent, rounding);
+    const subtotal = perBin * cnt;
+    breakdown.push(`Bin ${i+1}: level ${lvl}, count ${cnt}, per bin ${perBin}, subtotal ${subtotal}`);
+    total += subtotal;
   });
-  talentLevel.addEventListener('change', updateAndRender);
-  roundMode.addEventListener('change', updateAndRender);
-  guildApplyDH.addEventListener('change', updateAndRender);
 
-  addBinBtn.addEventListener('click', () => {
-    addBin(1,1);
-  });
+  if (includeDH.checked && parseInt(dhLevel.value) > 0) {
+    const dhLvl = parseInt(dhLevel.value);
+    const dhAmount = [0,1,2,3,4].map((t,i)=>calculateDH(i,dhLvl,guild,card,talent,rounding,applyGuild));
+    const tierIndex = parseInt(tier.substring(1)) - 1;
+    total += dhAmount[tierIndex];
+    breakdown.push(`Dragon Hoard: level ${dhLvl}, adds ${dhAmount[tierIndex]} to ${tier}`);
+  }
 
-  clearBinsBtn.addEventListener('click', () => {
-    clearBins();
-  });
+  totalResource.textContent = total;
+  breakdownDiv.innerHTML = breakdown.join("<br>");
+}
 
-  includeDH.addEventListener('change', () => {
-    if(includeDH.checked){
-      dhOptions.classList.remove('hidden');
-    } else {
-      dhOptions.classList.add('hidden');
-    }
-    updateAndRender();
-  });
+guildLevel.addEventListener("input", () => {
+  guildValue.textContent = guildLevel.value;
+  calculate();
+});
 
-  dhLevel.addEventListener('input', () => {
-    dhLevelOut.value = dhLevel.value;
-    updateAndRender();
-  });
+talentLevel.addEventListener("input", () => {
+  talentValue.textContent = talentLevel.value;
+  calculate();
+});
 
-  toggleBreakdown.addEventListener('click', () => {
-    if(breakdown.classList.contains('hidden')){
-      breakdown.classList.remove('hidden');
-      toggleBreakdown.textContent = 'Hide breakdown';
-    } else {
-      breakdown.classList.add('hidden');
-      toggleBreakdown.textContent = 'Show breakdown';
-    }
-  });
+tierSelect.addEventListener("change", () => {
+  updateTalentMax();
+  calculate();
+});
 
-  // initial UI setup
-  guildLevelOut.value = guildLevel.value;
-  dhLevelOut.value = dhLevel.value;
-  refreshTalentOptions();
-  // default: create one bin row
-  addBin(17,1); // helpful default so user sees something; you can remove or change as desired
+includeDH.addEventListener("change", () => {
+  dhSection.classList.toggle("hidden", !includeDH.checked);
+  calculate();
+});
 
-  // update UI when talent changes to enforce caps (the talent select is rebuilt on tier change)
-  talentLevel.addEventListener('change', () => updateAndRender());
+dhLevel.addEventListener("input", () => {
+  dhValue.textContent = dhLevel.value;
+  calculate();
+});
 
-})();
+addBinBtn.addEventListener("click", () => addBin());
+clearBinsBtn.addEventListener("click", clearBins);
+toggleBreakdown.addEventListener("click", () => breakdownDiv.classList.toggle("hidden"));
+
+updateTalentMax();
+calculate();

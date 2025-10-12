@@ -1,71 +1,48 @@
 body {
   font-family: Arial, sans-serif;
-  background: #f7f7f7;
+  background: #fce4ec;
+  color: #333;
   padding: 20px;
 }
 
 .container {
-  max-width: 700px;
-  background: white;
+  max-width: 500px;
+  margin: auto;
+  background: #fff;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
 h1, h2 {
-  margin-top: 0;
+  text-align: center;
 }
 
-.form-group {
-  margin-bottom: 10px;
-}
-
-.form-group label {
-  display: inline-block;
-  min-width: 180px;
-}
-
-.form-group input[type="range"] {
-  vertical-align: middle;
-}
-
-.checkbox label {
-  min-width: auto;
-}
-
-.bins-section .button-group {
-  margin-bottom: 10px;
-}
-
-.bin {
+.input-group {
+  margin: 10px 0;
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 6px;
-  padding: 5px;
-  background: #f0f0f0;
-  border-radius: 8px;
 }
 
-.total {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.hidden {
-  display: none;
+input, select {
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
 }
 
 button {
-  background: #1976d2;
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background: #f06292;
   color: white;
   border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
+  border-radius: 8px;
+  font-size: 16px;
   cursor: pointer;
 }
 
 button:hover {
-  background: #145ca1;
+  background: #ec407a;
 }

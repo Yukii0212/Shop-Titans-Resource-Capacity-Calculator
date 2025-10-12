@@ -1,62 +1,75 @@
-// --- Base bin capacities ---
-const baseCapacities = {
+// Base capacities for tiers
+export const baseCaps = {
   T1: [35,41,47,53,59,65,77,89,101,113,125,145,165,185,205,225,250,275,300,325,350,380,410,440,470],
   T2: [15,18,21,24,27,30,36,42,48,54,60,68,76,84,92,100,110,120,130,140,150,162,174,186,198],
   T3: [8,10,12,14,16,18,21,24,27,30,33,37,41,45,49,53,58,63,68,73,78,84,90,96,102],
   T4: [5,6,7,8,9,10,12,14,16,18,20,23,26,29,32,35,40,45,50,55,60,66,72,78,84]
 };
 
-// --- Dragon Hoard capacities per tier ---
-const dragonHoard = [
-  [10,12,14,16,18,20,24,28,32,36,40,46,52,58,64,70,78,86,94,102,110,120,130,140,150], // T1
-  [0,0,0,0,0,10,12,14,16,18,20,22,24,26,28,30,33,36,39,42,45,49,53,57,61], // T2
-  [0,0,0,0,0,0,0,0,0,0,10,11,12,13,14,15,17,19,21,23,25,28,31,34,37], // T3
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,2,3,4,5,6,8,10,12,14] // T4
-];
-
-// --- Guild perks flat bonus ---
-const guildFlat = { T1: 3, T2: 1.5, T3: 1, T4: 1 };
-
-// --- Card % boosts ---
-const cardBoosts = { 0: 0, 1: 0.05, 2: 0.10, 3: 0.20 };
-
-// --- Talent % boosts per tier ---
-const talentBoosts = {
-  T1: [0, 0.05, 0.10, 0.20],
-  T2: [0, 0.04, 0.08, 0.12, 0.16, 0.20],
-  T3: [0, 0.04, 0.08, 0.12, 0.16, 0.20],
-  T4: [0, 0.05, 0.10, 0.25]
+// Guild perk boosts per tier (per level)
+export const guildBoosts = {
+  T1: 3,
+  T2: 1.5,
+  T3: 1,
+  T4: 1
 };
 
-// --- Calculation function ---
-function calculateBin(tier, level, guildLevel, cardLevel, talentLevel, roundingMode) {
-  const base = baseCapacities[tier][level - 1];
-  const guildBonus = guildLevel * guildFlat[tier];
-  const cardMultiplier = 1 + cardBoosts[cardLevel];
-  const talentMultiplier = 1 + talentBoosts[tier][talentLevel];
+// TCG card %
+export const cardPct = [0,0.05,0.10,0.20];
 
-  let result = (base + guildBonus) * cardMultiplier * talentMultiplier;
+// Crafting talent %
+export const talentPct = {
+  T1: [0,0.05,0.10,0.20],
+  T2: [0,0.04,0.08,0.12,0.16,0.20],
+  T3: [0,0.04,0.08,0.12,0.16,0.20],
+  T4: [0,0.05,0.10,0.25]
+};
 
-  if (roundingMode === "floor") result = Math.floor(result);
-  if (roundingMode === "ceil") result = Math.ceil(result);
-  if (roundingMode === "round") result = Math.round(result);
+// Dragon Hoard table by tier [T1,T2,T3,T4] per level
+export const dragonHoard = [
+  [10,0,0,0],
+  [12,0,0,0],
+  [14,0,0,0],
+  [16,0,0,0],
+  [18,0,0,0],
+  [20,10,0,0],
+  [24,12,0,0],
+  [28,14,0,0],
+  [32,16,0,0],
+  [36,18,0,0],
+  [40,20,10,0],
+  [46,22,12,0],
+  [52,24,12,0],
+  [58,26,13,0],
+  [64,28,14,0],
+  [70,30,15,1],
+  [78,33,17,2],
+  [86,36,19,3],
+  [94,39,21,4],
+  [102,42,23,5],
+  [110,45,25,6],
+  [120,49,28,8],
+  [130,53,31,10],
+  [140,57,34,12],
+  [150,61,37,14]
+];
 
-  return result;
+// Calculate total resource
+export function calcTotal(tier, binLevel, binAmount, guildLevel, cardLevel, talentLevel, includeDH=false, dhLevel=1) {
+  const base = baseCaps[tier][binLevel-1] * binAmount;
+  const guild = guildBoosts[tier] * guildLevel * binAmount;
+  const totalBase = base + guild;
+
+  const card = cardPct[cardLevel];
+  const talent = talentPct[tier][talentLevel];
+
+  let total = totalBase * (1 + card + talent);
+
+  if(includeDH){
+    const dhIndex = dhLevel -1;
+    const dhContribution = dragonHoard[dhIndex][["T1","T2","T3","T4"].indexOf(tier)];
+    total += dhContribution * (1 + card + talent);
+  }
+
+  return Math.round(total);
 }
-
-function calculateDH(tier, level, guildLevel, cardLevel, talentLevel, roundingMode, applyGuild) {
-  const dhBase = dragonHoard[tier][level - 1];
-  const guildBonus = applyGuild ? guildLevel * guildFlat[`T${tier + 1}`] : 0;
-  const cardMultiplier = 1 + cardBoosts[cardLevel];
-  const talentMultiplier = 1 + talentBoosts[`T${tier + 1}`][talentLevel];
-
-  let result = (dhBase + guildBonus) * cardMultiplier * talentMultiplier;
-
-  if (roundingMode === "floor") result = Math.floor(result);
-  if (roundingMode === "ceil") result = Math.ceil(result);
-  if (roundingMode === "round") result = Math.round(result);
-
-  return result;
-}
-
-export { calculateBin, calculateDH };

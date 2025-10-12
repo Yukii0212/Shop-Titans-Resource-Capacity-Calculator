@@ -1,14 +1,22 @@
 const Data = {
-    // Bin capacities by tier and level (level 1 = index 0)
-    binCapacities: {
+    // Bin base capacities by tier and level (level 1 = index 0)
+    binBaseCapacities: {
         T1: [35, 41, 47, 53, 59, 65, 77, 89, 101, 113, 125, 145, 165, 185, 205, 225, 250, 275, 300, 325, 350, 380, 410, 440, 470],
         T2: [15, 18, 21, 24, 27, 30, 36, 42, 48, 54, 60, 68, 76, 84, 92, 100, 110, 120, 130, 140, 150, 162, 174, 186, 198],
         T3: [8, 10, 12, 14, 16, 18, 21, 24, 27, 30, 33, 37, 41, 45, 49, 53, 58, 63, 68, 73, 78, 84, 90, 96, 102],
         T4: [5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 23, 26, 29, 32, 35, 40, 45, 50, 55, 60, 66, 72, 78, 84]
     },
 
-    // Dragon Hoard capacities [T1, T2, T3, T4] by level
-    dragonHoard: [
+    // Guild perks per level
+    guildPerks: {
+        T1: 3,    // per level per bin
+        T2: 1.5,  // per level per bin  
+        T3: 1,    // per level per bin
+        T4: 1     // per level per bin
+    },
+
+    // Dragon Hoard base capacities [T1, T2, T3, T4] by level
+    dragonHoardBase: [
         [10, 0, 0, 0],    // Level 1
         [12, 0, 0, 0],    // Level 2
         [14, 0, 0, 0],    // Level 3
@@ -36,16 +44,9 @@ const Data = {
         [150, 61, 37, 14]  // Level 25
     ],
 
-    // Guild perks per level
-    guildPerks: {
-        T1: 3,    // per level
-        T2: 1.5,  // per level  
-        T3: 1,    // per level
-        T4: 1     // per level
-    },
-
     // Card bonuses by level
     cards: {
+        0: 0,
         1: 0.05,
         2: 0.10,
         3: 0.20

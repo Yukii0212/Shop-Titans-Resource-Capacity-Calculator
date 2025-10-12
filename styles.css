@@ -182,6 +182,15 @@ select:focus, input[type="number"]:focus {
     color: #2c3e50;
 }
 
+.warning {
+    background: #fff3cd !important;
+    border-left: 3px solid #ffc107 !important;
+    color: #856404 !important;
+    padding: 10px !important;
+    border-radius: 4px;
+    margin: 10px 0;
+}
+
 /* Responsive design */
 @media (max-width: 600px) {
     .container {

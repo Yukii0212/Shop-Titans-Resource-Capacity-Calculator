@@ -164,15 +164,24 @@ class App {
         const talentPercent = (result.breakdown.talentBonus * 100).toFixed(0);
         const totalPercent = (result.breakdown.totalMultiplier * 100 - 100).toFixed(0);
 
+        let guildInfo = '';
+        if (tier === 'T4' && result.breakdown.effectiveGuildLevel < parseInt(document.getElementById('guild-level').value)) {
+            guildInfo = `<p class="warning"><strong>Note:</strong> T4 Guild Perk capped at level 4</p>`;
+        } else if (tier !== 'T4' && result.breakdown.effectiveGuildLevel < parseInt(document.getElementById('guild-level').value)) {
+            guildInfo = `<p class="warning"><strong>Note:</strong> T1-T3 Guild Perk capped at level 8</p>`;
+        }
+
         resultDiv.innerHTML = `
             <h3>Total Capacity: ${result.total}</h3>
             <div class="breakdown">
                 <p><strong>Regular Bins:</strong> ${result.breakdown.baseBins.toFixed(1)}</p>
                 <p><strong>Dragon Hoard:</strong> +${result.breakdown.dragonHoard.toFixed(1)}</p>
                 <p><strong>Before Bonuses:</strong> ${result.breakdown.beforeBonuses.toFixed(1)}</p>
+                <p><strong>Guild Bonus per Bin:</strong> +${result.breakdown.guildBonusPerBin}</p>
                 <p><strong>Card Bonus:</strong> +${cardPercent}%</p>
                 <p><strong>Talent Bonus:</strong> +${talentPercent}%</p>
                 <p><strong>Total Multiplier:</strong> ×${result.breakdown.totalMultiplier.toFixed(2)} (+${totalPercent}%)</p>
+                ${guildInfo}
             </div>
             <div class="formula-note">
                 <strong>Formula:</strong> (Regular Bins + Dragon Hoard) × (1 + Card% + Talent%)<br>

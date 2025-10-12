@@ -99,15 +99,22 @@ class App {
         
         const maxLevel = ResourceCalculator.getMaxLevel(tier);
         const guildPerk = ResourceCalculator.getGuildPerkValue(tier, document.getElementById('guild-level').value);
-        const baseValue = Data.binBaseCapacities[tier][0]; // Level 1 base
+        const baseValue = Data.binBaseCapacities[tier][0];
         
         row.innerHTML = `
-            <select class="bin-level">
-                ${this.getLevelOptions(tier)}
-            </select>
-            <input type="number" class="bin-count" value="1" min="1" max="99">
-            <span class="bin-preview">→ ${baseValue + guildPerk} capacity</span>
-            <button type="button" class="remove-bin">Remove</button>
+            <div class="bin-controls">
+                <div class="bin-level-group">
+                    <label>Bin Level:</label>
+                    <select class="bin-level">
+                        ${this.getLevelOptions(tier)}
+                    </select>
+                </div>
+                <div class="bin-count-group">
+                    <label>Quantity:</label>
+                    <input type="number" class="bin-count" value="1" min="1" max="99">
+                </div>
+                <button type="button" class="remove-bin">Remove</button>
+            </div>
         `;
         container.appendChild(row);
 
@@ -130,7 +137,9 @@ class App {
         let options = '';
         for (let i = 1; i <= maxLevel; i++) {
             const baseValue = Data.binBaseCapacities[tier][i - 1];
-            options += `<option value="${i}">Level ${i} (Base: ${baseValue})</option>`;
+            const guildPerk = ResourceCalculator.getGuildPerkValue(tier, document.getElementById('guild-level').value);
+            const totalCapacity = baseValue + guildPerk;
+            options += `<option value="${i}">Level ${i} (Capacity: ${totalCapacity})</option>`;
         }
         return options;
     }
@@ -142,7 +151,10 @@ class App {
         const guildPerk = ResourceCalculator.getGuildPerkValue(tier, guildLevel);
         const total = baseValue + guildPerk;
         
-        row.querySelector('.bin-preview').textContent = `→ ${total} capacity`;
+        // Update the option text to show current capacity
+        const select = row.querySelector('.bin-level');
+        const currentOption = select.options[select.selectedIndex];
+        currentOption.text = `Level ${level} (Capacity: ${total})`;
     }
 
     updateTalentMaxLevel(tier) {
@@ -161,7 +173,7 @@ class App {
         const guildLevel = parseInt(document.getElementById('guild-level').value);
         const guildPerk = ResourceCalculator.getGuildPerkValue(tier, guildLevel);
         
-        // Update all bin previews
+        // Update all bin level dropdowns to show current capacities
         document.querySelectorAll('.bin-row').forEach(row => {
             this.updateBinPreview(row, tier);
         });

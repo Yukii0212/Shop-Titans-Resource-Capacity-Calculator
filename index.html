@@ -3,62 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resource Bin Calculator</title>
+    <title>Yuki's Resource Bin Calculator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Resource Bin Calculator</h1>
+        <header>
+            <h1>Yuki's Resource Bin Calculator</h1>
+        </header>
         
         <form id="calculator-form">
-            <div class="form-group">
-                <label for="tier">Resource Tier:</label>
-                <select id="tier">
-                    <option value="T1">Tier 1 (Iron, Wood, Leather, Herb)</option>
-                    <option value="T2">Tier 2 (Steel, Ironwood, Fabric, Oil)</option>
-                    <option value="T3">Tier 3 (Jewels, Ether)</option>
-                    <option value="T4">Tier 4 (Essence)</option>
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label>Bins:</label>
-                <div id="bin-container" class="bin-container">
-                    <!-- Bin rows will be added here -->
+            <div class="form-section">
+                <h2>Resource Configuration</h2>
+                
+                <div class="form-group">
+                    <label for="tier">Resource Tier:</label>
+                    <select id="tier">
+                        <option value="T1">Tier 1 (Iron, Wood, Leather, Herb)</option>
+                        <option value="T2">Tier 2 (Steel, Ironwood, Fabric, Oil)</option>
+                        <option value="T3">Tier 3 (Jewels, Ether)</option>
+                        <option value="T4">Tier 4 (Essence)</option>
+                    </select>
                 </div>
-                <button type="button" id="add-bin">Add Another Bin</button>
+
+                <div class="form-group">
+                    <label for="guild-level">Guild Perk Level:</label>
+                    <select id="guild-level">
+                        <option value="0">0 (+0)</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                        <option value="7">7</option>
+                        <option value="8" selected>8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                    </select>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="guild-level">Guild Perk Level:</label>
-                <input type="number" id="guild-level" value="8" min="0" max="20">
+            <div class="form-section">
+                <h2>Bins Configuration</h2>
+                
+                <div class="form-group">
+                    <label>Bins:</label>
+                    <div id="bin-container" class="bin-container">
+                        <!-- Bin rows will be added here -->
+                    </div>
+                    <button type="button" id="add-bin" class="btn-secondary">+ Add Another Bin</button>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="card-level">TCG Card Level:</label>
-                <select id="card-level">
-                    <option value="0">None</option>
-                    <option value="1">Level 1 (+5%)</option>
-                    <option value="2" selected>Level 2 (+10%)</option>
-                    <option value="3">Level 3 (+20%)</option>
-                </select>
+            <div class="form-section">
+                <h2>Bonuses</h2>
+                
+                <div class="form-group">
+                    <label for="card-level">TCG Card Level:</label>
+                    <select id="card-level">
+                        <option value="0">None (+0%)</option>
+                        <option value="1">Level 1 (+5%)</option>
+                        <option value="2" selected>Level 2 (+10%)</option>
+                        <option value="3">Level 3 (+20%)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="talent-level">Crafting Talent Level:</label>
+                    <select id="talent-level">
+                        <!-- Options will be populated based on tier -->
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="dragon-level">Dragon Hoard Level:</label>
+                    <select id="dragon-level">
+                        <!-- Options 1-25 -->
+                    </select>
+                </div>
             </div>
 
-            <div class="form-group">
-                <label for="talent-level">Crafting Talent Level:</label>
-                <select id="talent-level">
-                    <!-- Options will be populated based on tier -->
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label for="dragon-level">Dragon Hoard Level:</label>
-                <select id="dragon-level">
-                    <!-- Options 1-25 -->
-                </select>
-            </div>
-
-            <button type="submit">Calculate</button>
+            <button type="submit" class="btn-primary">Calculate Total Capacity</button>
         </form>
 
         <div id="result" class="result"></div>

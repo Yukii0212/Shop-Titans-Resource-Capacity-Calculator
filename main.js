@@ -48,8 +48,48 @@ class App {
         // Update talent max level
         this.updateTalentMaxLevel(tier);
         
+        // Update guild perk options based on tier
+        this.updateGuildPerkOptions(tier);
+        
         // Update guild perk display
         this.updateGuildPerkDisplay();
+    }
+
+    updateGuildPerkOptions(tier) {
+        const guildSelect = document.getElementById('guild-level');
+        const currentValue = parseInt(guildSelect.value);
+        
+        if (tier === 'T4') {
+            // T4 can only go up to level 4
+            guildSelect.innerHTML = `
+                <option value="0">0 (+0)</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4" ${currentValue === 4 ? 'selected' : ''}>4 (Max for T4)</option>
+            `;
+            // If current value was above 4, set it to 4
+            if (currentValue > 4) {
+                guildSelect.value = '4';
+            }
+        } else {
+            // T1-T3 can go up to level 8
+            guildSelect.innerHTML = `
+                <option value="0">0 (+0)</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8" ${currentValue === 8 ? 'selected' : currentValue > 8 ? 'selected' : ''}>8 (Max for T1-T3)</option>
+            `;
+            // If current value was above 8, set it to 8
+            if (currentValue > 8) {
+                guildSelect.value = '8';
+            }
+        }
     }
 
     addBinRow(tier) {

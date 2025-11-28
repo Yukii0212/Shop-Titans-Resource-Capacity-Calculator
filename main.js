@@ -221,8 +221,8 @@ class App {
 
         resultDiv.innerHTML = `
             <h3>Total Capacity: ${result.total}</h3>
-            <h2>Usable Resource (Without triggering worker refills): ${preThreshold25}</h2>
-            <h2>May trigger worker refills if you go below this amount: ${threshold25}</h3>
+            <h2>Usable Resource (Without triggering worker refills): <span style="color: #7fd49a;">${preThreshold25}</span></h2>
+            <h2>May trigger worker refills if you go below this amount: <span style="color: #b0002a;">${threshold25}</span></h2>
             <div class="breakdown">
                 <p><strong>Regular Bins:</strong> ${result.breakdown.baseBins.toFixed(1)}</p>
                 <p><strong>Dragon Hoard:</strong> +${result.breakdown.dragonHoard.toFixed(1)}</p>

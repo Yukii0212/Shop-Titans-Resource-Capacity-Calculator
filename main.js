@@ -206,6 +206,8 @@ class App {
     }
 
     displayResult(result, tier) {
+        const threshold25 = result.total / 4;
+        const preThreshold25 = result.total - threshold25;
         const resultDiv = document.getElementById('result');
         const cardPercent = (result.breakdown.cardBonus * 100).toFixed(0);
         const talentPercent = (result.breakdown.talentBonus * 100).toFixed(0);
@@ -219,6 +221,8 @@ class App {
 
         resultDiv.innerHTML = `
             <h3>Total Capacity: ${result.total}</h3>
+            <h2>Usable Resource (Without triggering worker refills): ${preThreshold25}</h2>
+            <h2>May trigger worker refills if you go below this amount: ${threshold25}</h3>
             <div class="breakdown">
                 <p><strong>Regular Bins:</strong> ${result.breakdown.baseBins.toFixed(1)}</p>
                 <p><strong>Dragon Hoard:</strong> +${result.breakdown.dragonHoard.toFixed(1)}</p>

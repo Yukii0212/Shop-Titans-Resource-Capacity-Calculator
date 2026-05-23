@@ -42,6 +42,21 @@ class App {
     onTierChange(tier) {
         // Update bin rows for new tier
         const binContainer = document.getElementById('bin-container');
+        const dragonSelect = document.getElementById('dragon-level');
+        const addButton = document.getElementById('add-bin');
+        const cardGroup = document.getElementById('card-level').parentElement;
+
+        if (tier === 'Stardust') {
+            dragonSelect.value = '0';
+            dragonSelect.disabled = true;
+            addButton.style.display = 'none';
+            cardGroup.style.display = 'none';
+        } else {
+            dragonSelect.disabled = false;
+            addButton.style.display = 'block';
+            cardGroup.style.display = 'block';
+        }
+
         binContainer.innerHTML = '';
         this.addBinRow(tier);
         
@@ -58,42 +73,44 @@ class App {
     updateGuildPerkOptions(tier) {
         const guildSelect = document.getElementById('guild-level');
         const currentValue = parseInt(guildSelect.value);
-        
-        if (tier === 'T4') {
-            // T4 can only go up to level 4
-            guildSelect.innerHTML = `
-                <option value="0">0 (+0)</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4" ${currentValue === 4 ? 'selected' : ''}>4 (Max for T4)</option>
+
+        // Get max level from data.js
+        const maxLevel = Data.guildLevelCaps[tier];
+
+        // Start with level 0
+        guildSelect.innerHTML =
+            '<option value="0">0 (+0)</option>';
+
+        // Generate levels automatically
+        for (let i = 1; i <= maxLevel; i++) {
+            const selected =
+                (currentValue === i) ||
+                (currentValue > maxLevel && i === maxLevel);
+
+            guildSelect.innerHTML += `
+                <option value="${i}" ${selected ? 'selected' : ''}>
+                    ${i}${i === maxLevel ? ' (Max)' : ''}
+                </option>
             `;
-            // If current value was above 4, set it to 4
-            if (currentValue > 4) {
-                guildSelect.value = '4';
-            }
-        } else {
-            // T1-T3 can go up to level 8
-            guildSelect.innerHTML = `
-                <option value="0">0 (+0)</option>
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8" ${currentValue === 8 ? 'selected' : currentValue > 8 ? 'selected' : ''}>8 (Max for T1-T3)</option>
-            `;
-            // If current value was above 8, set it to 8
-            if (currentValue > 8) {
-                guildSelect.value = '8';
-            }
+        }
+
+        // Clamp value if current exceeds cap
+        if (currentValue > maxLevel) {
+            guildSelect.value = maxLevel;
         }
     }
 
     addBinRow(tier) {
         const container = document.getElementById('bin-container');
+
+        if (
+            tier === 'Stardust' &&
+            document.querySelectorAll('.bin-row').length >= 1
+        ) {
+            alert('Stardust only allows one bin');
+            return;
+        }
+
         const row = document.createElement('div');
         row.className = 'bin-row';
         
@@ -221,14 +238,22 @@ class App {
 
         resultDiv.innerHTML = `
             <h3>Total Capacity: ${result.total}</h3>
-            <h2>Usable Resource (Without triggering worker refills): <span style="color: #7fd49a;">${preThreshold25}</span></h2>
-            <h2>May trigger worker refills if you go below this amount: <span style="color: #b0002a;">${threshold25}</span></h2>
+            ${tier !== 'Stardust' ? `
+            <h2>Usable Resource (Without triggering worker refills):
+            <span style="color: #7fd49a;">${preThreshold25}</span></h2>
+
+            <h2>May trigger worker refills if you go below this amount:
+            <span style="color: #b0002a;">${threshold25}</span></h2>
+            ` : ''}
             <div class="breakdown">
                 <p><strong>Regular Bins:</strong> ${result.breakdown.baseBins.toFixed(1)}</p>
                 <p><strong>Dragon Hoard:</strong> +${result.breakdown.dragonHoard.toFixed(1)}</p>
                 <p><strong>Before Bonuses:</strong> ${result.breakdown.beforeBonuses.toFixed(1)}</p>
                 <p><strong>After Talent +${talentPercent}%:</strong> ${result.breakdown.afterTalent.toFixed(1)}</p>
-                <p><strong>After Card +${cardPercent}%:</strong> ${result.breakdown.afterCard.toFixed(1)}</p>
+                ${tier !== 'Stardust'
+                ? `<p><strong>After Card +${cardPercent}%:</strong>
+                ${result.breakdown.afterCard.toFixed(1)}</p>`
+                : ''}
                 <p><strong>Guild Bonus per Bin:</strong> +${result.breakdown.guildBonusPerBin}</p>
                 ${guildInfo}
             </div>

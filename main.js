@@ -103,21 +103,23 @@ class App {
     addBinRow(tier) {
         const container = document.getElementById('bin-container');
 
+        // Count only bins inside container
+        const existingBins =
+            container.querySelectorAll('.bin-row').length;
+
+        // Stardust only allows one bin
         if (
             tier === 'Stardust' &&
-            document.querySelectorAll('.bin-row').length >= 1
+            existingBins >= 1
         ) {
-            alert('Stardust only allows one bin');
             return;
         }
 
         const row = document.createElement('div');
         row.className = 'bin-row';
-        
+
         const maxLevel = ResourceCalculator.getMaxLevel(tier);
-        const guildPerk = ResourceCalculator.getGuildPerkValue(tier, document.getElementById('guild-level').value);
-        const baseValue = Data.binBaseCapacities[tier][0];
-        
+
         row.innerHTML = `
             <div class="bin-controls">
                 <div class="bin-level-group">
@@ -126,25 +128,49 @@ class App {
                         ${this.getLevelOptions(tier)}
                     </select>
                 </div>
+
                 <div class="bin-count-group">
                     <label>Quantity:</label>
-                    <input type="number" class="bin-count" value="1" min="1" max="99">
+
+                    <input
+                        type="number"
+                        class="bin-count"
+                        value="1"
+                        min="1"
+                        max="${tier === 'Stardust' ? '1' : '99'}"
+                        ${tier === 'Stardust' ? 'readonly' : ''}
+                    >
                 </div>
-                <button type="button" class="remove-bin">Remove</button>
+
+                <button type="button" class="remove-bin">
+                    Remove
+                </button>
             </div>
         `;
+
         container.appendChild(row);
 
-        // Add event listeners
-        row.querySelector('.bin-level').addEventListener('change', (e) => {
-            this.updateBinPreview(row, tier);
-        });
-        
-        row.querySelector('.remove-bin').addEventListener('click', () => {
-            if (document.querySelectorAll('.bin-row').length > 1) {
-                row.remove();
+        // Bin level changes
+        row.querySelector('.bin-level').addEventListener(
+            'change',
+            () => {
+                this.updateBinPreview(row, tier);
             }
-        });
+        );
+
+        // Remove button
+        row.querySelector('.remove-bin').addEventListener(
+            'click',
+            () => {
+                const totalBins =
+                    container.querySelectorAll('.bin-row').length;
+
+                // Never allow removing the last bin
+                if (totalBins > 1) {
+                    row.remove();
+                }
+            }
+        );
 
         this.updateBinPreview(row, tier);
     }
